@@ -170,18 +170,11 @@ function startTest() {
   if (testFinished) return;
 
   const name = $("student-name").value.trim();
-  const studentId = $("student-id").value.trim();
 
   if (!name) {
     $("name-error").hidden = false;
     $("student-name").focus();
     return;
-  }
-
-  if (studentId) {
-    localStorage.setItem("reading_student_id", studentId);
-  } else {
-    localStorage.removeItem("reading_student_id");
   }
 
   $("name-error").hidden = true;
@@ -637,7 +630,6 @@ async function postModule(num, autoSubmitted = false) {
     event: "module_submission",
     testName: "Reading Practice Test",
     studentFullName: studentName,
-    studentId: studentId,
     attemptId: getOrCreateAttemptId(),
     sessionId: getOrCreateSessionId(),
     module: `Module ${num}`,
