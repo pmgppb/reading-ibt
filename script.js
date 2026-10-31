@@ -17,6 +17,65 @@ let testFinished = false;
 
 const optionLetters = ["A", "B", "C", "D"];
 
+function getOrCreateAttemptId() {
+  const key = "reading_attempt_id";
+  let id = localStorage.getItem(key);
+
+  if (!id) {
+    id = `attempt_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;
+    localStorage.setItem(key, id);
+  }
+
+  return id;
+}
+
+function getOrCreateSessionId() {
+  const key = "reading_session_id";
+  let id = sessionStorage.getItem(key);
+
+  if (!id) {
+    id = `session_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;
+    sessionStorage.setItem(key, id);
+  }
+
+  return id;
+}
+
+function getDeviceInfo() {
+  const ua = navigator.userAgent || "";
+  const isMobile = /Mobi|Android|iPhone|iPad|Windows Phone/i.test(ua);
+  const isTablet = /iPad|Tablet/i.test(ua) || (isMobile && /Android/i.test(ua) && screen.width > 500);
+
+  let deviceType = "desktop";
+  if (isTablet) deviceType = "tablet";
+  else if (isMobile) deviceType = "mobile";
+
+  let browser = "Other";
+  if (/Edg/i.test(ua)) browser = "Edge";
+  else if (/Chrome/i.test(ua)) browser = "Chrome";
+  else if (/Firefox/i.test(ua)) browser = "Firefox";
+  else if (/Safari/i.test(ua)) browser = "Safari";
+
+  let os = "Other";
+  if (/Windows/i.test(ua)) os = "Windows";
+  else if (/Mac/i.test(ua)) os = "macOS";
+  else if (/Android/i.test(ua)) os = "Android";
+  else if (/iPhone|iPad/i.test(ua)) os = "iOS";
+
+  const deviceFingerprint =
+    `${navigator.userAgent}|${screen.width}x${screen.height}|${navigator.platform}|${new Date().getTimezoneOffset()}`;
+
+  return {
+    deviceType,
+    browser,
+    os,
+    userAgent: ua,
+    screenWidth: screen.width,
+    screenHeight: screen.height,
+    deviceFingerprint
+  };
+}
+
 /* ---------- ANSWER HELPERS ---------- */
 
 function normalizeAnswer(value) {
@@ -111,11 +170,18 @@ function startTest() {
   if (testFinished) return;
 
   const name = $("student-name").value.trim();
+  const studentId = $("student-id").value.trim();
 
   if (!name) {
     $("name-error").hidden = false;
     $("student-name").focus();
     return;
+  }
+
+  if (studentId) {
+    localStorage.setItem("reading_student_id", studentId);
+  } else {
+    localStorage.removeItem("reading_student_id");
   }
 
   $("name-error").hidden = true;
@@ -564,17 +630,33 @@ function scoreModule(num) {
 
 async function postModule(num, autoSubmitted = false) {
   const score = scoreModule(num);
+  const deviceInfo = getDeviceInfo();
+  const studentId = localStorage.getItem("reading_student_id") || "";
 
   const payload = {
     event: "module_submission",
     testName: "Reading Practice Test",
     studentFullName: studentName,
+    studentId: studentId,
+    attemptId: getOrCreateAttemptId(),
+    sessionId: getOrCreateSessionId(),
     module: `Module ${num}`,
     submittedAt: new Date().toISOString(),
     autoSubmitted,
     score: score.correct,
     maxScore: score.max,
     scoredQuestionsAnswered: score.scoredAnswered,
+
+    deviceType: deviceInfo.deviceType,
+    browser: deviceInfo.browser,
+    os: deviceInfo.os,
+    screenWidth: deviceInfo.screenWidth,
+    screenHeight: deviceInfo.screenHeight,
+    userAgent: deviceInfo.userAgent,
+    deviceFingerprint: deviceInfo.deviceFingerprint,
+    submissionSource: "web",
+    isMultiDeviceSubmission: false,
+
     answers: TEST_DATA[num].questions.map((q) => ({
       questionNumber: q.n,
       answer: answers[num][q.n] ?? "",
@@ -590,6 +672,23 @@ async function postModule(num, autoSubmitted = false) {
     console.warn("Google Apps Script URL is not configured.", payload);
     return { saved: false, score };
   }
+
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    return { saved: true, score };
+  } catch (err) {
+    console.error("Submission error:", err);
+    return { saved: false, score };
+  }
+}
 
   try {
     await fetch(GOOGLE_SCRIPT_URL, {
