@@ -170,11 +170,18 @@ function startTest() {
   if (testFinished) return;
 
   const name = $("student-name").value.trim();
+  const studentId = $("student-id").value.trim();
 
   if (!name) {
     $("name-error").hidden = false;
     $("student-name").focus();
     return;
+  }
+
+  if (studentId) {
+    localStorage.setItem("reading_student_id", studentId);
+  } else {
+    localStorage.removeItem("reading_student_id");
   }
 
   $("name-error").hidden = true;
@@ -630,6 +637,7 @@ async function postModule(num, autoSubmitted = false) {
     event: "module_submission",
     testName: "Reading Practice Test",
     studentFullName: studentName,
+    studentId: studentId,
     attemptId: getOrCreateAttemptId(),
     sessionId: getOrCreateSessionId(),
     module: `Module ${num}`,
@@ -664,23 +672,6 @@ async function postModule(num, autoSubmitted = false) {
     console.warn("Google Apps Script URL is not configured.", payload);
     return { saved: false, score };
   }
-
-  try {
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    return { saved: true, score };
-  } catch (err) {
-    console.error("Submission error:", err);
-    return { saved: false, score };
-  }
-}
 
   try {
     await fetch(GOOGLE_SCRIPT_URL, {
