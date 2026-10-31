@@ -674,18 +674,14 @@ async function postModule(num, autoSubmitted = false) {
   }
 
   try {
-    const response = await fetch(GOOGLE_SCRIPT_URL, {
+    await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
-      mode: "cors",
+      mode: "no-cors",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "text/plain;charset=utf-8"
       },
       body: JSON.stringify(payload)
     });
-
-    const text = await response.text();
-
-    console.log("Submission response:", text);
 
     return { saved: true, score };
   } catch (err) {
