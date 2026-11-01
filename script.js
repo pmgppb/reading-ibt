@@ -206,8 +206,7 @@ function beginModule(num) {
   secondsLeft = TEST_DATA[num].minutes * 60;
 
   $("module-label").textContent = TEST_DATA[num].title;
-  $("question-module").textContent =
-    TEST_DATA[num].title.toUpperCase();
+  $("question-module").textContent = TEST_DATA[num].title.toUpperCase();
 
   $("welcome-screen").hidden = true;
   $("review-screen").hidden = true;
@@ -241,8 +240,7 @@ function updateTimer() {
   $("timer").textContent =
     `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 
-  $("timer").style.color =
-    secondsLeft <= 60 ? "#ffb7a9" : "white";
+  $("timer").style.color = secondsLeft <= 60 ? "#ffb7a9" : "white";
 }
 
 /* ---------- RENDER QUESTIONS ---------- */
@@ -268,22 +266,16 @@ function renderQuestion() {
   const passage = currentModule().passages[q.p];
 
   $("passage-content").innerHTML = passage.html;
-  $("test-screen").classList.toggle(
-    "word-completion",
-    q.type === "text"
-  );
+  $("test-screen").classList.toggle("word-completion", q.type === "text");
   $("passage-content").classList.toggle("large-text", largeText);
   $("passage-kicker").textContent = passage.title.toUpperCase();
 
-  // Replace missing-word markers with letter boxes.
   currentModule().questions
     .filter((item) => item.type === "text" && item.p === q.p)
     .forEach((item) => {
       const marker = `[${item.n}]`;
-
-      const slot = [
-        ...$("passage-content").querySelectorAll(".slot")
-      ].find((el) => el.textContent.trim() === marker);
+      const slot = [...$("passage-content").querySelectorAll(".slot")]
+        .find((el) => el.textContent.trim() === marker);
 
       if (!slot) return;
 
@@ -294,8 +286,7 @@ function renderQuestion() {
         item.answer.length - prefix.length - suffix.length
       );
 
-      let boxes =
-        `<span class="inline-word" data-inline-word="${item.n}">`;
+      let boxes = `<span class="inline-word" data-inline-word="${item.n}">`;
 
       for (let i = 0; i < missingCount; i++) {
         boxes += `
@@ -321,8 +312,7 @@ function renderQuestion() {
   const saved = answers[moduleNo][q.n] ?? "";
 
   if (q.type === "mc") {
-    let content =
-      `<p class="question-stem">${escapeHTML(q.stem)}</p>`;
+    let content = `<p class="question-stem">${escapeHTML(q.stem)}</p>`;
 
     content +=
       `<div class="options" role="radiogroup" aria-label="Answer choices">` +
@@ -365,13 +355,10 @@ function renderQuestion() {
     `;
   }
 
-  // Restore saved letters and keyboard controls.
   $("passage-content").querySelectorAll(".inline-word").forEach((wordEl) => {
     const n = Number(wordEl.dataset.inlineWord);
 
-    const item = currentModule().questions.find(
-      (item) => item.n === n
-    );
+    const item = currentModule().questions.find((item) => item.n === n);
 
     const prefix = item.prefix || "";
     const suffix = item.suffix || "";
@@ -382,9 +369,7 @@ function renderQuestion() {
     if (savedWord) {
       const visiblePrefix = savedWord.slice(0, prefix.length).toLowerCase();
       if (visiblePrefix === prefix.toLowerCase()) {
-        const endIndex = suffix
-          ? savedWord.length - suffix.length
-          : savedWord.length;
+        const endIndex = suffix ? savedWord.length - suffix.length : savedWord.length;
         typedMissing = savedWord.slice(prefix.length, endIndex);
       } else {
         typedMissing = savedWord;
@@ -420,10 +405,7 @@ function renderQuestion() {
         } else if (e.key === "ArrowLeft" && index > 0) {
           boxes[index - 1].focus();
           e.preventDefault();
-        } else if (
-          e.key === "ArrowRight" &&
-          index < boxes.length - 1
-        ) {
+        } else if (e.key === "ArrowRight" && index < boxes.length - 1) {
           boxes[index + 1].focus();
           e.preventDefault();
         }
@@ -445,10 +427,7 @@ function renderQuestion() {
         const letters = boxes.map((b) => b.value).join("");
         answers[moduleNo][n] = (prefix + letters + suffix).trim();
 
-        const focusIndex = Math.min(
-          paste.length,
-          boxes.length - 1
-        );
+        const focusIndex = Math.min(paste.length, boxes.length - 1);
 
         if (boxes[focusIndex]) boxes[focusIndex].focus();
 
@@ -539,8 +518,7 @@ function showReview() {
   $("test-screen").hidden = true;
   $("review-screen").hidden = false;
 
-  $("review-heading").textContent =
-    `Review ${currentModule().title}`;
+  $("review-heading").textContent = `Review ${currentModule().title}`;
 
   const missing = currentModule().questions.filter(
     (q) => !answered(q)
@@ -635,7 +613,7 @@ async function postModule(num, autoSubmitted = false) {
 
   const payload = {
     event: "module_submission",
-    testName: "Reading Test",
+    testName: "Reading Practice Test",
     studentFullName: studentName,
     studentId: studentId,
     attemptId: getOrCreateAttemptId(),
