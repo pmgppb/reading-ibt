@@ -635,7 +635,7 @@ async function postModule(num, autoSubmitted = false) {
 
   const payload = {
     event: "module_submission",
-    testName: "Reading Practice Test",
+    testName: "Reading Test",
     studentFullName: studentName,
     studentId: studentId,
     attemptId: getOrCreateAttemptId(),
