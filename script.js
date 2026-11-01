@@ -1,6 +1,6 @@
 /* Google Apps Script Web App URL */
 const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzgAoy2fQ-admk4DPqXf8G3CW2PFT2VCXYB7FuEDFv-tl6sncJwVuzr15ciUd5ntAFL9A/exec";
+  "https://script.google.com/macros/s/AKfycbzGR20WsADhetZ_7lW733Yn4mnSeOrHqQiyOZm21zpAQhs-AVcMmcTEvwOiENwA4yJw/exec";
 
 const $ = (id) => document.getElementById(id);
 
@@ -683,23 +683,6 @@ async function postModule(num, autoSubmitted = false) {
     const text = await response.text();
     console.log("Submission response status:", response.status);
     console.log("Submission response body:", text);
-
-    return { saved: true, score };
-  } catch (err) {
-    console.error("Submission error:", err);
-    return { saved: false, score };
-  }
-}
-
-  try {
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify(payload)
-    });
 
     return { saved: true, score };
   } catch (err) {
