@@ -1,6 +1,6 @@
 /* Google Apps Script Web App URL */
 const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzGR20WsADhetZ_7lW733Yn4mnSeOrHqQiyOZm21zpAQhs-AVcMmcTEvwOiENwA4yJw/exec";
+  "https://https://script.google.com/macros/s/AKfycbxT4FQ0d3hL0q2Fh1KOpRq1eZYc5GbNBo8JG2lYu6O17QeUJi4KNXd2Y4--XnmNkph-/exec";
 
 const $ = (id) => document.getElementById(id);
 
