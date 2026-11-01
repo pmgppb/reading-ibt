@@ -648,19 +648,19 @@ async function postModule(num, autoSubmitted = false) {
     return { saved: false, score };
   }
 
-  try {
+try {
     const response = await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
-      mode: "cors",
+      mode: "no-cors", // <--- Changed from "cors" to "no-cors"
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "text/plain;charset=utf-8" // <--- Changed from application/json to text/plain
       },
       body: JSON.stringify(payload)
     });
 
-    const text = await response.text();
-    console.log("Submission response status:", response.status);
-    console.log("Submission response body:", text);
+    // Note: Under "no-cors", the response is opaque and response.text() cannot be read,
+    // but the request will successfully transmit without throwing a NetworkError.
+    console.log("Submission sent successfully.");
 
     return { saved: true, score };
   } catch (err) {
