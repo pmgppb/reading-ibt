@@ -635,7 +635,7 @@ async function postModule(num, autoSubmitted = false) {
 
   const payload = {
     event: "module_submission",
-    testName: "Reading Test",
+    testName: "Reading Practice Test",
     studentFullName: studentName,
     studentId: studentId,
     attemptId: getOrCreateAttemptId(),
@@ -665,23 +665,24 @@ async function postModule(num, autoSubmitted = false) {
     }))
   };
 
-  if (
-    !GOOGLE_SCRIPT_URL ||
-    GOOGLE_SCRIPT_URL.includes("PASTE_YOUR")
-  ) {
+  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE_YOUR")) {
     console.warn("Google Apps Script URL is not configured.", payload);
     return { saved: false, score };
   }
 
   try {
-    await fetch(GOOGLE_SCRIPT_URL, {
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
-      mode: "no-cors",
+      mode: "cors",
       headers: {
-        "Content-Type": "text/plain;charset=utf-8"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify(payload)
     });
+
+    const text = await response.text();
+    console.log("Submission response status:", response.status);
+    console.log("Submission response body:", text);
 
     return { saved: true, score };
   } catch (err) {
